@@ -1,0 +1,23 @@
+SMART STUDY NOTES GENERATOR
+TEST RESULTS
+==============================
+
+TEST 1 – ARTIFICIAL INTELLIGENCE
+
+Original Words:49
+Summary Words:35
+Percentage Reduction:28.57%
+
+
+TEST 2 – INTERNET OF THINGS
+
+Original Words:52
+Summary Words:30
+Percentage Reduction:
+
+
+TEST 3 – CLOUD COMPUTING
+
+Original Words:47
+Summary Words:35
+Percentage Reduction:25.53

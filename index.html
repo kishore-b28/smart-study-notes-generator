@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Study Notes Generator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .generate {
+            background: #2563eb;
+            color: white;
+        }
+
+        .clear {
+            background: #ddd;
+            margin-left: 10px;
+        }
+
+        .generate:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            margin-top: 30px;
+        }
+
+        .box {
+            background: #f8fafc;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #2563eb;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            background: #eef2ff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .stat strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat p {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                margin: 15px auto;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <h1>Smart Study Notes Generator</h1>
+
+            <p class="subtitle">
+                AI-Based Text Summarization using BART
+            </p>
+
+            <h3>Enter Your Study Paragraph</h3>
+
+            <textarea id="inputText"
+                placeholder="Enter or paste your study paragraph here..."></textarea>
+
+            <br>
+
+            <button class="generate" onclick="generateSummary()">
+                Generate Summary
+            </button>
+
+            <button class="clear" onclick="clearAll()">
+                Clear
+            </button>
+
+            <div class="loading" id="loading">
+                Generating AI summary... Please wait.
+            </div>
+
+            <div class="result">
+
+                <h2>Summary</h2>
+
+                <div class="box" id="summary">
+                    Your AI-generated summary will appear here.
+                </div>
+
+                <h2>Statistics</h2>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <strong>Original Words</strong>
+                        <p id="originalWords">0</p>
+                    </div>
+
+                    <div class="stat">
+                        <strong>Summary Words</strong>
+                        <p id="summaryWords">0</p>
+                    </div>
+
+                    <div class="stat">
+                        <strong>Reduction</strong>
+                        <p id="reduction">0%</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        async function generateSummary() {
+
+            const text =
+                document.getElementById("inputText").value.trim();
+
+            if (text === "") {
+                alert("Please enter a paragraph first.");
+                return;
+            }
+
+            document.getElementById("loading").style.display = "block";
+
+            document.getElementById("summary").innerText =
+                "Generating summary...";
+
+            try {
+
+                const response = await fetch("/summarize", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        text: text
+                    })
+
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Something went wrong");
+                }
+
+                document.getElementById("summary").innerText =
+                    data.summary;
+
+                document.getElementById("originalWords").innerText =
+                    data.original_words;
+
+                document.getElementById("summaryWords").innerText =
+                    data.summary_words;
+
+                document.getElementById("reduction").innerText =
+                    data.reduction.toFixed(2) + "%";
+
+            }
+
+            catch (error) {
+
+                document.getElementById("summary").innerText =
+                    "Error: " + error.message;
+
+            }
+
+            finally {
+
+                document.getElementById("loading").style.display = "none";
+
+            }
+        }
+
+
+        function clearAll() {
+
+            document.getElementById("inputText").value = "";
+
+            document.getElementById("summary").innerText =
+                "Your AI-generated summary will appear here.";
+
+            document.getElementById("originalWords").innerText = "0";
+
+            document.getElementById("summaryWords").innerText = "0";
+
+            document.getElementById("reduction").innerText = "0%";
+
+        }
+
+    </script>
+
+</body>
+
+</html>
